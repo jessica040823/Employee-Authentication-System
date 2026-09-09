@@ -18,14 +18,14 @@ function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-yellow-50 pt-24 text-center">
+    <div className="min-h-screen bg-background pt-24 text-center ">
 
       {/* Heading */}
-      <h1 className="text-4xl font-bold">
+      <h1 className="text-4xl font-bold text-foreground">
         Welcome to Employee Portal
       </h1>
 
-      <p className="mt-4 text-gray-500">
+      <p className="mt-4 text-muted-foreground">
         Register and manage employee information easily.
       </p>
 
@@ -36,14 +36,14 @@ function Home() {
 
           <div>
             <img
-              src="/image1.jpg"
+              src="/image1.png"
               alt="Employee Portal"
               className="h-120 w-full object-cover"
             />
           </div>
 
           <div>
-            <img
+            <img  
               src="/image2.jpg"
               alt="Employee Portal"
               className="h-120 w-full object-cover"
@@ -70,11 +70,11 @@ function Home() {
           {/* Left Side */}
           <div className="flex flex-col justify-center text-left">
 
-            <h2 className="text-4xl font-bold">
+            <h2 className="text-4xl font-bold text-foreground">
               About Employee Portal
             </h2>
 
-            <p className="mt-6 text-lg leading-8 text-gray-600">
+            <p className="mt-6 text-lg leading-8 text-muted-foreground">
               Welcome to Employee Portal. Our platform makes employee
               registration and information management simple and convenient.
               We help organizations manage employee details efficiently
@@ -84,7 +84,7 @@ function Home() {
             {/* View More Link */}
             <Link
               to="/about"
-              className="mt-6 w-fit font-semibold text-purple-600 hover:text-purple-800"
+              className="mt-6 w-fit font-semibold text-primary hover:opacity-80"
             >
               View More →
             </Link>
@@ -109,9 +109,9 @@ function Home() {
 
 
       {/* Footer */}
-      <footer className="mt-8 w-full border-b border-purple-300 bg-purple-200 px-3 py-3 shadow-sm">
+      <footer className="mt-8 w-full border-b border-border bg-secondary px-3 py-3 shadow-sm">
 
-        <p className="mt-2 text-sm font-bold text-purple-900">
+        <p className="mt-2 text-sm font-bold text-secondary-foreground">
           © 2026 Employee Portal. All rights reserved.
         </p>
 

@@ -4,7 +4,8 @@ import Home from "./pages/Home";
 import About from "./pages/About";
 import EmployeeForm from "./pages/EmployeeForm";
 import Login from "./pages/Login";
-
+import Services from "./pages/Services";
+import ForgetPassword from "./pages/ForgetPassword";
 import PublicLayout from "./components/layouts/PublicLayout";
 import PrivateLayout from "./components/layouts/PrivateLayout";
 import Dashboard from "./pages/Dashboard";
@@ -28,6 +29,12 @@ const router = createBrowserRouter([
             path: "about",
             Component: About,
           },
+          //Services
+          {
+            path: "services",
+            Component: Services,
+          },
+
         ],
       },
 
@@ -43,6 +50,10 @@ const router = createBrowserRouter([
             path: "register",
             Component: EmployeeForm,
           },
+          {
+            path: "forgetpassword",
+            Component: ForgetPassword,
+          }
         ],
       },
       // Private pages
