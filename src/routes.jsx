@@ -5,7 +5,9 @@ import About from "./pages/About";
 import EmployeeForm from "./pages/EmployeeForm";
 import Login from "./pages/Login";
 import Services from "./pages/Services";
+import ServiceDetails from "./pages/ServiceDetails";
 import ForgetPassword from "./pages/ForgetPassword";
+import ResetPassword from "./pages/ResetPassword";
 import PublicLayout from "./components/layouts/PublicLayout";
 import PrivateLayout from "./components/layouts/PrivateLayout";
 import Dashboard from "./pages/Dashboard";
@@ -29,12 +31,18 @@ const router = createBrowserRouter([
             path: "about",
             Component: About,
           },
-          //Services
+
+          // Services → /services
           {
             path: "services",
             Component: Services,
           },
 
+          // Service Details → /services/web-development
+          {
+            path: "services/:serviceId",
+            Component: ServiceDetails,
+          },
         ],
       },
 
@@ -53,9 +61,15 @@ const router = createBrowserRouter([
           {
             path: "forgetpassword",
             Component: ForgetPassword,
-          }
+          },
         ],
       },
+
+      {
+        path: "reset-password",
+        Component: ResetPassword,
+      },
+
       // Private pages
       {
         path: "admin",

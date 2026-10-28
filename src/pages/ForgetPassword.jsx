@@ -4,41 +4,66 @@ import { FaLock, FaEnvelope } from "react-icons/fa";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
 import { useNavigate } from "react-router-dom";
+import { forgetPasswordSchema } from "@/validation/forgetPassword.schema";
+import { forgotpassword } from "@/services/authService";
+import { useMutation } from "@tanstack/react-query";
 
 const ForgetPassword = () => {
   const navigate = useNavigate();
 
-  return (
-    <div className="min-h-screen bg-background flex justify-center items-center p-5">
+  const forgotMutation = useMutation({
+    mutationFn: forgotpassword,
 
-      <div className=" fixed w-full max-w-lg bg-card shadow-lg overflow-hidden py-8">
+    onSuccess: (data) => {
+      console.log("Reset link sent successfully:", data);
+      navigate("/auth/reset-password");
+    },
+
+    onError: (error) => {
+      console.log(
+        "Forgot password failed:",
+        error.response?.data || error.message
+      );
+    },
+  });
+
+  return (
+    <div className="min-h-screen bg-background flex justify-center items-center px-4 py-8">
+
+      <div className="w-full max-w-lg bg-card shadow-lg overflow-hidden rounded-2xl py-6 sm:py-8">
 
         {/* Header */}
-        <div className="flex flex-col px-10 pt-4 pb-8 space-y-4 items-center">
+        <div className="flex flex-col px-5 sm:px-10 pt-4 pb-6 sm:pb-8 space-y-4 items-center">
 
-          <div className="bg-primary rounded-full p-4">
-            <FaLock size={20} className="text-primary-foreground" />
+          <div className="bg-primary rounded-full p-3 sm:p-4">
+            <FaLock
+              size={20}
+              className="text-primary-foreground"
+            />
           </div>
 
-          <h1 className="font-extrabold text-2xl">
+          <h1 className="font-extrabold text-xl sm:text-2xl text-center">
             Forgot Password?
           </h1>
 
-          <p className="text-center text-muted-foreground leading-relaxed max-w-md">
-            Enter your email address and we will send you a link to reset your password.
+          <p className="text-center text-sm sm:text-base text-muted-foreground leading-relaxed max-w-md">
+            Enter your email address and we will send you a link to reset
+            your password.
           </p>
 
         </div>
+
 
         <Formik
           initialValues={{
             email: "",
           }}
+          validationSchema={forgetPasswordSchema}
           onSubmit={(values) => {
-            console.log(values);
+            forgotMutation.mutate(values.email);
           }}
         >
-          <div className="px-10 pb-6">
+          <div className="px-5 sm:px-10 pb-6">
 
             <Form className="space-y-5">
 
@@ -58,7 +83,7 @@ const ForgetPassword = () => {
                     name="email"
                     type="email"
                     placeholder="Enter your email"
-                    className="pl-10 h-11"
+                    className="pl-10 h-11 w-full"
                   />
 
                 </div>
@@ -71,14 +96,29 @@ const ForgetPassword = () => {
 
               </div>
 
+
               {/* Submit Button */}
               <Button
                 type="submit"
                 className="w-full bg-primary h-11"
+                disabled={forgotMutation.isPending}
               >
-                Send Reset Link
+                {forgotMutation.isPending
+                  ? "Sending..."
+                  : "Send Reset Link"}
               </Button>
 
+
+              {/* Error */}
+              {forgotMutation.isError && (
+                <p className="text-sm text-destructive text-center">
+                  {forgotMutation.error?.response?.data?.message ||
+                    "Failed to send reset link."}
+                </p>
+              )}
+
+
+              {/* Back to Login */}
               <div className="text-center pt-2">
 
                 <button

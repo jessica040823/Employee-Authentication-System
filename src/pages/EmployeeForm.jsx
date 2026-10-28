@@ -1,7 +1,8 @@
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
-import axios from "axios";
+import { useMutation } from "@tanstack/react-query";
+import { registerUser } from "../services/authService";
 
 import {
   Select,
@@ -14,34 +15,31 @@ import {
 import employeeForm from "../validation/employeeSchema";
 import { FaEnvelope, FaLock, FaPhone, FaUser } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-
-const handleRegister = async (values) => {
-  try {
-    const response = await axios.post(
-      "http://192.168.150.169:3000/api/auth/register",
-      {
-        fullName: values.fullName,
-        email: values.email,
-        phone: values.phoneNumber,
-        password: values.password,
-        confirmPassword: values.confirmPassword,
-      }
-    );
-
-    console.log("Registration Successful", response.data);
-
-    return response.data;
-  } catch (error) {
-    console.log("Registration Failed", error.response?.data);
-    throw error;
-  }
-};
+import toast from "react-hot-toast";
 
 function EmployeeForm() {
   const navigate = useNavigate();
 
+  const registerMutation = useMutation({
+    mutationFn: registerUser,
+
+    onSuccess: (data) => {
+      // if(success)
+        toast.success("Registered Successfully.")
+      navigate("/auth/login");
+    },
+
+    onError: (error) => {
+      if(error.response?.status === 409)
+        toast.error(error.response.data.message || "Email already registered.")
+      else{
+        toast.error("Something went wrong. Try again!")
+      }
+    },
+  });
+
   return (
-    <div className="min-h-screen bg-background px-4 py-6">
+    <div className="min-h-screen bg-background px-3 sm:px-4 py-6 sm:py-10">
 
       <Formik
         initialValues={{
@@ -53,93 +51,91 @@ function EmployeeForm() {
           confirmPassword: "",
         }}
         validationSchema={employeeForm}
-        onSubmit={async (values) => {
-          try {
-            await handleRegister(values);
-            console.log("Registered successfully");
-            navigate("/auth/login");
-          } catch (error) {
-            console.log("Registration failed");
-          }
+        onSubmit={(values) => {
+          registerMutation.mutate({
+            fullName: values.fullName,
+            email: values.email,
+            phone: values.phoneNumber,
+            password: values.password,
+            confirmPassword: values.confirmPassword,
+          });
         }}
       >
         {({ setFieldValue }) => (
-
-          <Form className="mx-auto my-10 flex w-full max-w-xl flex-col gap-5 rounded-2xl border border-border bg-card shadow-lg p-10">
+          <Form className="mx-auto my-4 sm:my-10 flex w-full max-w-xl flex-col gap-4 sm:gap-5 rounded-2xl border border-border bg-card p-5 sm:p-8 md:p-10 shadow-lg">
 
             {/* Heading */}
             <div className="mb-2 text-center">
 
-              <h1 className="text-3xl font-extrabold tracking-tight text-foreground">
+              <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
                 Employee Registration
               </h1>
 
-              <p className="text-center pt-1 font-serif text-muted-foreground">
+              <p className="pt-1 text-sm sm:text-base text-muted-foreground">
                 Create your employee account
               </p>
 
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
 
               {/* Full Name */}
               <div className="flex flex-col gap-2">
-
-                <label>Full Name</label>
+                <label className="text-sm sm:text-base">
+                  Full Name
+                </label>
 
                 <div className="relative">
-
-                  <FaUser className="absolute left-3 top-2 text-muted-foreground" />
+                  <FaUser className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
 
                   <Field
                     as={Input}
                     name="fullName"
                     type="text"
                     placeholder="Enter your full name"
-                    className="pl-10"
+                    className="pl-10 w-full"
                   />
-
                 </div>
 
                 <span className="text-sm text-destructive">
                   <ErrorMessage name="fullName" />
                 </span>
-
               </div>
+
 
               {/* Email */}
               <div className="flex flex-col gap-2">
-
-                <label>Email</label>
+                <label className="text-sm sm:text-base">
+                  Email
+                </label>
 
                 <div className="relative">
-
-                  <FaEnvelope className="absolute left-3 top-2 text-muted-foreground" />
+                  <FaEnvelope className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
 
                   <Field
                     as={Input}
                     name="email"
                     type="email"
                     placeholder="Enter your email"
-                    className="pl-10"
+                    className="pl-10 w-full"
                   />
-
                 </div>
 
                 <span className="text-sm text-destructive">
                   <ErrorMessage name="email" />
                 </span>
-
               </div>
+
 
               {/* Phone Number */}
               <div className="flex flex-col gap-2">
-
-                <label>Phone Number</label>
+                <label className="text-sm sm:text-base">
+                  Phone Number
+                </label>
 
                 <div className="relative">
-
-                  <FaPhone className="absolute left-3 top-2 text-muted-foreground" />
+                  <FaPhone className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
 
                   <Field
                     as={Input}
@@ -147,133 +143,123 @@ function EmployeeForm() {
                     type="text"
                     placeholder="Enter 10 digit phone number"
                     maxLength={10}
-                    className="pl-10"
+                    className="pl-10 w-full"
                     inputMode="numeric"
                     onChange={(e) => {
                       const value = e.target.value.replace(/\D/g, "");
                       setFieldValue("phoneNumber", value);
                     }}
                   />
-
                 </div>
 
                 <span className="text-sm text-destructive">
                   <ErrorMessage name="phoneNumber" />
                 </span>
-
               </div>
+
 
               {/* Gender */}
               <div className="flex flex-col gap-2">
-
-                <label>Gender</label>
+                <label className="text-sm sm:text-base">
+                  Gender
+                </label>
 
                 <Select
                   onValueChange={(value) =>
                     setFieldValue("gender", value)
                   }
                 >
-
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select Gender" />
                   </SelectTrigger>
 
                   <SelectContent>
-
-                    <SelectItem value="Male">
-                      Male
-                    </SelectItem>
-
-                    <SelectItem value="Female">
-                      Female
-                    </SelectItem>
-
-                    <SelectItem value="Other">
-                      Other
-                    </SelectItem>
-
+                    <SelectItem value="Male">Male</SelectItem>
+                    <SelectItem value="Female">Female</SelectItem>
+                    <SelectItem value="Other">Other</SelectItem>
                   </SelectContent>
-
                 </Select>
 
                 <span className="text-sm text-destructive">
                   <ErrorMessage name="gender" />
                 </span>
-
               </div>
+
 
               {/* Password */}
               <div className="flex flex-col gap-2">
-
-                <label>Password</label>
+                <label className="text-sm sm:text-base">
+                  Password
+                </label>
 
                 <div className="relative">
-
-                  <FaLock className="absolute left-3 top-2 text-muted-foreground" />
+                  <FaLock className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
 
                   <Field
                     as={Input}
                     name="password"
                     type="password"
                     placeholder="Enter your password"
-                    className="pl-10"
+                    className="pl-10 w-full"
                   />
-
                 </div>
 
                 <span className="text-sm text-destructive">
                   <ErrorMessage name="password" />
                 </span>
-
               </div>
+
 
               {/* Confirm Password */}
               <div className="flex flex-col gap-2">
-
-                <label>Confirm Password</label>
+                <label className="text-sm sm:text-base">
+                  Confirm Password
+                </label>
 
                 <div className="relative">
-
-                  <FaLock className="absolute left-3 top-2 text-muted-foreground" />
+                  <FaLock className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
 
                   <Field
                     as={Input}
                     name="confirmPassword"
                     type="password"
                     placeholder="Confirm your password"
-                    className="pl-10"
+                    className="pl-10 w-full"
                   />
-
                 </div>
 
                 <span className="text-sm text-destructive">
                   <ErrorMessage name="confirmPassword" />
                 </span>
-
               </div>
 
             </div>
+
 
             {/* Register Button */}
             <Button
               type="submit"
               className="w-full"
+              disabled={registerMutation.isPending}
             >
-              Register
+              {registerMutation.isPending
+                ? "Registering..."
+                : "Register"}
             </Button>
 
-            <div className="flex justify-center text-sm text-muted-foreground">
+
+            {/* Login */}
+            <div className="flex justify-center text-center text-xs sm:text-sm text-muted-foreground">
 
               <p>
                 Already have an account?{" "}
 
-                
-                  <a href="/auth/login"
+                <a
+                  href="/auth/login"
                   className="text-primary hover:underline"
                 >
                   Login
                 </a>
-
               </p>
 
             </div>
