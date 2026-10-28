@@ -5,29 +5,27 @@ import {
   FaLock,
   FaEnvelope,
 } from "react-icons/fa";
-
+import axios from "axios";
 import { Formik, Form, Field, ErrorMessage } from "formik";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { loginSchema } from "@/validation/login.schema";
+import { loginSchema } from "../validation/login.schema";
 import { useMutation } from "@tanstack/react-query";
-import { loginUser } from "@/services/authService";
+import { loginUser, getProfile } from "../services/authService";
 import { toast } from "react-hot-toast";
-
-const isAuth = false;
 
 function Login() {
   const navigate = useNavigate();
+
   const [showPassword, setShowPassword] = useState(false);
 
   const loginMutation = useMutation({
     mutationFn: loginUser,
 
-  
-    onSuccess: (data) => {
-      toast.success("Logged in Successfully😊");
+    onSuccess: async (data) => {
+      console.log("LOGIN RESPONSE:", data);
 
       if (data.accessToken) {
         localStorage.setItem("authToken", data.accessToken);
@@ -37,22 +35,36 @@ function Login() {
         localStorage.setItem("refreshToken", data.refreshToken);
       }
 
-      navigate("/admin/dashboard");
+      // Role login response bata, chhaina bhane profile bata
+      let role = data?.user?.role || data?.role;
+
+      if (!role) {
+        try {
+          const profile = await getProfile();
+          role = profile?.role || profile?.user?.role;
+        } catch (e) {
+          console.log("Profile fetch failed:", e);
+        }
+      }
+
+      localStorage.setItem("userRole", role || "user");
+
+      // Tell Navbar that login happened
+      window.dispatchEvent(new Event("authChanged"));
+
+      toast.success("Logged in Successfully😊");
+
+      navigate(role === "admin" ? "/admin/dashboard" : "/");
     },
 
-    // CHANGED: safer error handling
     onError: (error) => {
       toast.error(
-        error.response?.data?.message || "Login Failed"
-      );
-    },
+        axios.isAxiosError(error)
+          ? error.response?.data?.message || "Login Failed😢"
+          : "Login Failed😢"
+  );
+},
   });
-
-  useEffect(() => {
-    if (isAuth) {
-      navigate("/admin/dashboard");
-    }
-  }, [navigate]);
 
   return (
     <div className="min-h-[calc(100vh-56px)] flex items-center justify-center bg-background px-4">
@@ -204,8 +216,10 @@ function Login() {
                 {/* ERROR */}
                 {loginMutation.isError && (
                   <p className="text-sm text-destructive text-center">
-                    {loginMutation.error?.response?.data?.message ||
-                      "Login failed. Please check your credentials."}
+                    {axios.isAxiosError(loginMutation.error)
+                      ? loginMutation.error.response?.data?.message ||
+                        "Login failed. Please check your credentials."
+                      : "Login failed. Please check your credentials."}
                   </p>
                 )}
 

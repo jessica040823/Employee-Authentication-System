@@ -16,6 +16,7 @@ import employeeForm from "../validation/employeeSchema";
 import { FaEnvelope, FaLock, FaPhone, FaUser } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import axios from "axios";
 
 function EmployeeForm() {
   const navigate = useNavigate();
@@ -25,22 +26,23 @@ function EmployeeForm() {
 
     onSuccess: (data) => {
       // if(success)
-        toast.success("Registered Successfully.")
+      toast.success("Registered Successfully.");
       navigate("/auth/login");
     },
 
     onError: (error) => {
-      if(error.response?.status === 409)
-        toast.error(error.response.data.message || "Email already registered.")
-      else{
-        toast.error("Something went wrong. Try again!")
-      }
+      toast.error(
+        axios.isAxiosError(error)
+          ? error.response?.status === 409
+            ? error.response.data?.message || "Email already registered."
+            : error.response?.data?.message ?? error.message
+          : error.message || "Something went wrong. Please try again."
+      );
     },
   });
 
   return (
     <div className="min-h-screen bg-background px-3 sm:px-4 py-6 sm:py-10">
-
       <Formik
         initialValues={{
           fullName: "",
@@ -63,10 +65,8 @@ function EmployeeForm() {
       >
         {({ setFieldValue }) => (
           <Form className="mx-auto my-4 sm:my-10 flex w-full max-w-xl flex-col gap-4 sm:gap-5 rounded-2xl border border-border bg-card p-5 sm:p-8 md:p-10 shadow-lg">
-
             {/* Heading */}
             <div className="mb-2 text-center">
-
               <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
                 Employee Registration
               </h1>
@@ -74,17 +74,12 @@ function EmployeeForm() {
               <p className="pt-1 text-sm sm:text-base text-muted-foreground">
                 Create your employee account
               </p>
-
             </div>
 
-
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5">
-
               {/* Full Name */}
               <div className="flex flex-col gap-2">
-                <label className="text-sm sm:text-base">
-                  Full Name
-                </label>
+                <label className="text-sm sm:text-base">Full Name</label>
 
                 <div className="relative">
                   <FaUser className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
@@ -103,12 +98,9 @@ function EmployeeForm() {
                 </span>
               </div>
 
-
               {/* Email */}
               <div className="flex flex-col gap-2">
-                <label className="text-sm sm:text-base">
-                  Email
-                </label>
+                <label className="text-sm sm:text-base">Email</label>
 
                 <div className="relative">
                   <FaEnvelope className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
@@ -127,12 +119,9 @@ function EmployeeForm() {
                 </span>
               </div>
 
-
               {/* Phone Number */}
               <div className="flex flex-col gap-2">
-                <label className="text-sm sm:text-base">
-                  Phone Number
-                </label>
+                <label className="text-sm sm:text-base">Phone Number</label>
 
                 <div className="relative">
                   <FaPhone className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
@@ -145,7 +134,7 @@ function EmployeeForm() {
                     maxLength={10}
                     className="pl-10 w-full"
                     inputMode="numeric"
-                    onChange={(e) => {
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                       const value = e.target.value.replace(/\D/g, "");
                       setFieldValue("phoneNumber", value);
                     }}
@@ -157,18 +146,11 @@ function EmployeeForm() {
                 </span>
               </div>
 
-
               {/* Gender */}
               <div className="flex flex-col gap-2">
-                <label className="text-sm sm:text-base">
-                  Gender
-                </label>
+                <label className="text-sm sm:text-base">Gender</label>
 
-                <Select
-                  onValueChange={(value) =>
-                    setFieldValue("gender", value)
-                  }
-                >
+                <Select onValueChange={(value) => setFieldValue("gender", value)}>
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select Gender" />
                   </SelectTrigger>
@@ -185,12 +167,9 @@ function EmployeeForm() {
                 </span>
               </div>
 
-
               {/* Password */}
               <div className="flex flex-col gap-2">
-                <label className="text-sm sm:text-base">
-                  Password
-                </label>
+                <label className="text-sm sm:text-base">Password</label>
 
                 <div className="relative">
                   <FaLock className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
@@ -209,12 +188,9 @@ function EmployeeForm() {
                 </span>
               </div>
 
-
               {/* Confirm Password */}
               <div className="flex flex-col gap-2">
-                <label className="text-sm sm:text-base">
-                  Confirm Password
-                </label>
+                <label className="text-sm sm:text-base">Confirm Password</label>
 
                 <div className="relative">
                   <FaLock className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
@@ -232,9 +208,7 @@ function EmployeeForm() {
                   <ErrorMessage name="confirmPassword" />
                 </span>
               </div>
-
             </div>
-
 
             {/* Register Button */}
             <Button
@@ -242,32 +216,21 @@ function EmployeeForm() {
               className="w-full"
               disabled={registerMutation.isPending}
             >
-              {registerMutation.isPending
-                ? "Registering..."
-                : "Register"}
+              {registerMutation.isPending ? "Registering..." : "Register"}
             </Button>
-
 
             {/* Login */}
             <div className="flex justify-center text-center text-xs sm:text-sm text-muted-foreground">
-
               <p>
                 Already have an account?{" "}
-
-                <a
-                  href="/auth/login"
-                  className="text-primary hover:underline"
-                >
+                <a href="/auth/login" className="text-primary hover:underline">
                   Login
                 </a>
               </p>
-
             </div>
-
           </Form>
         )}
       </Formik>
-
     </div>
   );
 }

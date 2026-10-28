@@ -2,23 +2,15 @@ import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getServices } from "../services/authService";
 import { Link } from "react-router-dom";
-import Footer from "@/components/Footer";
+import Footer from "../components/Footer";
 
-const serviceImages = {
-  "web-developmentt": "/serviceImages/web1.jpg",
-  "web-development": "/serviceImages/web2.png",
-  "uiux": "/serviceImages/uiux.jpg",
-  "mobile-app-development": "/serviceImages/mobile.jpg",
-  "seo-digital-marketing": "/serviceImages/seo.jpg",
-  "java-developers": "/serviceImages/java.jpg",
-  "data-analyst": "/serviceImages/data.jpg",
-  "qa": "/serviceImages/qa.jpg",
-  "gardening": "/serviceImages/garden.jpg",
-  "non-illum-qui-dolor": "/serviceImages/lorem1",
-  "sit-ipsa-reprehend": "/serviceImages/lorem2.png",
-  "ipsam-temporibus-iur": "/serviceImages/lorem3.jpg",
-  "greek": "/serviceImages/greek.jpg"
-};
+
+const API_BASE_URL = "http://192.168.150.169:3000";
+const DEFAULT_IMAGE = "/images/default-service.jpg";
+
+// Image API ko public folder ma chha: 3000/public/<service.image>
+const getImageUrl = (service : any) =>
+  service?.image ? `${API_BASE_URL}/public/${service.image}` : DEFAULT_IMAGE;
 
 const Services = () => {
   const {
@@ -96,19 +88,20 @@ const Services = () => {
 
         {/* Services */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 sm:gap-6 max-w-6xl mx-auto">
-          {services?.map((service) => (
+          {services?.map((service: any) => (
             <div
               key={service.id}
               className="bg-card rounded-xl shadow-md p-4 sm:p-6 text-center hover:bg-secondary transition"
             >
               <img
-                src={
-                  serviceImages[service.slug] ||
-                  "/images/default-service.jpg"
-                }
-                alt={service.title}
-                className="w-full h-40 sm:h-44 object-cover rounded-xl"
-              />
+ src={getImageUrl(service)}
+ alt={service?.title || "Service"}
+ className="w-full h-40 sm:h-44 object-cover rounded-xl"
+ onError={(e) => {
+ e.currentTarget.onerror = null;
+ e.currentTarget.src = DEFAULT_IMAGE;
+ }}
+ />
 
               <h2 className="mt-4 sm:mt-5 text-base sm:text-lg font-bold">
                 {service.title}

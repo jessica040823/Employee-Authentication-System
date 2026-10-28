@@ -4,9 +4,11 @@ import { FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { resetPasswordSchema } from "@/validation/resetPassword.schema";
-import { resetpassword } from "@/services/authService";
+import { resetPasswordSchema } from "../validation/resetPassword.schema";
+import { resetpassword } from "../services/authService";
 import { useMutation } from "@tanstack/react-query";
+
+import axios from "axios";
 
 const ResetPassword = () => {
   const navigate = useNavigate();
@@ -25,10 +27,11 @@ const ResetPassword = () => {
       navigate("/auth/login");
     },
 
-    onError: (error) => {
-      console.log(
-        "Password reset failed:",
-        error.response?.data || error.message
+    onError: (error) => {(
+       axios.isAxiosError(error)
+          ? error.response?.data?.message || "Password reset Failed😢"
+          : "Password Reset Failed😢"
+      
       );
     },
   });
@@ -75,6 +78,7 @@ const ResetPassword = () => {
             resetMutation.mutate({
               token: token,
               newPassword: values.password,
+              confirmPassword: values.confirmPassword,
             });
           }}
         >
@@ -188,8 +192,10 @@ const ResetPassword = () => {
               {/* API Error */}
               {resetMutation.isError && (
                 <p className="text-sm text-destructive text-center">
-                  {resetMutation.error?.response?.data?.message ||
-                    "Failed to reset password."}
+                  {axios.isAxiosError(resetMutation.error)
+                    ? resetMutation.error.response?.data?.message ||
+                      "Failed to reset password."
+                    : "Failed to reset password."}
                 </p>
               )}
 

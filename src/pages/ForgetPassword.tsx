@@ -4,9 +4,10 @@ import { FaLock, FaEnvelope } from "react-icons/fa";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { forgetPasswordSchema } from "@/validation/forgetPassword.schema";
-import { forgotpassword } from "@/services/authService";
+import { forgetPasswordSchema } from "../validation/forgetPassword.schema";
+import { forgotpassword } from "../services/authService";
 import { useMutation } from "@tanstack/react-query";
+import axios from "axios";
 
 const ForgetPassword = () => {
   const navigate = useNavigate();
@@ -16,13 +17,13 @@ const ForgetPassword = () => {
 
     onSuccess: (data) => {
       console.log("Reset link sent successfully:", data);
-      navigate("/auth/reset-password");
+      navigate("/reset-password");
     },
 
-    onError: (error) => {
-      console.log(
-        "Forgot password failed:",
-        error.response?.data || error.message
+    onError: (error) => {(
+        axios.isAxiosError(error)
+        ? error.response?.data || error.message
+        : "Forget Password failed"
       );
     },
   });
@@ -101,7 +102,7 @@ const ForgetPassword = () => {
               <Button
                 type="submit"
                 className="w-full bg-primary h-11"
-                disabled={forgotMutation.isPending}
+                disabled={forgotMutation.isPending} 
               >
                 {forgotMutation.isPending
                   ? "Sending..."
@@ -112,8 +113,10 @@ const ForgetPassword = () => {
               {/* Error */}
               {forgotMutation.isError && (
                 <p className="text-sm text-destructive text-center">
-                  {forgotMutation.error?.response?.data?.message ||
-                    "Failed to send reset link."}
+                  {axios.isAxiosError(forgotMutation.error)
+                    ? forgotMutation.error.response?.data?.message ||
+                      "Failed to send reset link."
+                    : "Failed to send reset link."}
                 </p>
               )}
 

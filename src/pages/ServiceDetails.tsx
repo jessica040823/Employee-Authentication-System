@@ -3,21 +3,13 @@ import { useQuery } from "@tanstack/react-query";
 import { useParams, Link } from "react-router-dom";
 import { getServices } from "../services/authService";
 
-const serviceImages = {
-   "web-developmentt": "/serviceImages/web1.jpg",
-  "web-development": "/serviceImages/web2.png",
-  "uiux": "/serviceImages/uiux.jpg",
-  "mobile-app-development": "/serviceImages/mobile.jpg",
-  "seo-digital-marketing": "/serviceImages/seo.jpg",
-  "java-developers": "/serviceImages/java.jpg",
-  "data-analyst": "/serviceImages/data.jpg",
-  "qa": "/serviceImages/qa.jpg",
-  "gardening": "/serviceImages/garden.jpg",
-  "non-illum-qui-dolor": "/serviceImages/lorem1",
-  "sit-ipsa-reprehend": "/serviceImages/lorem2.png",
-  "ipsam-temporibus-iur": "/serviceImages/lorem3.jpg",
-  "greek": "/serviceImages/greek.jpg"
-};
+
+const API_BASE_URL = "http://192.168.150.169:3000";
+const DEFAULT_IMAGE = "/images/default-service.jpg";
+
+// Image API ko public folder ma chha: 3000/public/<service.image>
+const getImageUrl = (service : any ) =>
+  service?.image ? `${API_BASE_URL}/public/${service.image}` : DEFAULT_IMAGE;
 
 const ServiceDetails = () => {
   const { serviceId } = useParams();
@@ -71,7 +63,7 @@ const ServiceDetails = () => {
 
   // Find selected service
   const service = services?.find(
-    (item) => String(item.id) === String(serviceId)
+    (item : any) => String(item.id) === String(serviceId)
   );
 
 
@@ -107,13 +99,14 @@ const ServiceDetails = () => {
 
         {/* Service Image */}
         <img
-          src={
-            serviceImages[service.slug] ||
-            "/images/default-service.jpg"
-          }
-          alt={service.title}
-          className="w-full h-48 sm:h-56 md:h-64 object-cover rounded-xl"
-        />
+ src={getImageUrl(service)}
+ alt={service?.title || "Service"}
+ className="w-full h-48 sm:h-56 md:h-64 object-cover rounded-xl"
+ onError={(e) => {
+ e.currentTarget.onerror = null;
+ e.currentTarget.src = DEFAULT_IMAGE;
+ }}
+ />
 
 
         {/* Title */}
@@ -159,7 +152,7 @@ const ServiceDetails = () => {
 
             <div className="flex flex-wrap gap-2 mt-3">
 
-              {service.tags.map((tag) => (
+              {service.tags.map((tag : any) => (
 
                 <span
                   key={tag}
