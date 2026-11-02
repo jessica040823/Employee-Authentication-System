@@ -3,6 +3,7 @@ import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { useMutation } from "@tanstack/react-query";
 import { registerUser } from "../services/authService";
+import { useState } from "react";
 
 import {
   Select,
@@ -13,19 +14,20 @@ import {
 } from "../components/ui/select";
 
 import employeeForm from "../validation/employeeSchema";
-import { FaEnvelope, FaLock, FaPhone, FaUser } from "react-icons/fa";
+import { FaEnvelope, FaLock, FaPhone, FaUser, FaEyeSlash, FaEye } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import axios from "axios";
 
 function EmployeeForm() {
   const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const registerMutation = useMutation({
     mutationFn: registerUser,
 
-    onSuccess: (data) => {
-      // if(success)
+    onSuccess: () => {
       toast.success("Registered Successfully.");
       navigate("/auth/login");
     },
@@ -177,10 +179,18 @@ function EmployeeForm() {
                   <Field
                     as={Input}
                     name="password"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     placeholder="Enter your password"
-                    className="pl-10 w-full"
+                    className="pl-10 pr-10 w-full"
                   />
+
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                  >
+                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                  </button>
                 </div>
 
                 <span className="text-sm text-destructive">
@@ -198,10 +208,18 @@ function EmployeeForm() {
                   <Field
                     as={Input}
                     name="confirmPassword"
-                    type="password"
+                    type={showConfirmPassword ? "text" : "password"}
                     placeholder="Confirm your password"
-                    className="pl-10 w-full"
+                    className="pl-10 pr-10 w-full"
                   />
+
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
+                  >
+                    {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                  </button>
                 </div>
 
                 <span className="text-sm text-destructive">

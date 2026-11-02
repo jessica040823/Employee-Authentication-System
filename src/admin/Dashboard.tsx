@@ -311,7 +311,7 @@ const Dashboard = () => {
 
       {/* ================= MAIN CONTENT ================= */}
       <main className="min-h-screen min-w-0 flex-1 px-5 py-8 sm:px-8">
-        <div className="mx-auto max-w-6xl">
+        <div className="mx-auto mt-8 max-w-6xl">
           {/* Header */}
           <div className="relative text-center">
             <button
@@ -386,8 +386,8 @@ const Dashboard = () => {
           </div>
 
           {/* Bottom Section (same band look as "Why Choose Us") */}
-          <div className="mt-8 rounded-xl bg-secondary p-5 sm:p-6">
-            <div className="grid gap-5 lg:grid-cols-2">
+          <div className="mx-auto mt-8 max-w-6xl rounded-xl bg-secondary p-5 sm:p-6">
+            <div className="grid grid-cols-1 items-stretch gap-6 md:grid-cols-2 sm:gap-10">
               {/* Services Overview */}
               <div className="rounded-xl bg-card p-6 text-left">
                 <h3 className="text-lg font-bold text-foreground">

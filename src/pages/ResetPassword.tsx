@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import { FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
 import { Input } from "../components/ui/input";
@@ -7,7 +7,7 @@ import { useNavigate, useSearchParams } from "react-router-dom";
 import { resetPasswordSchema } from "../validation/resetPassword.schema";
 import { resetpassword } from "../services/authService";
 import { useMutation } from "@tanstack/react-query";
-
+import toast from "react-hot-toast";
 import axios from "axios";
 
 const ResetPassword = () => {
@@ -27,11 +27,11 @@ const ResetPassword = () => {
       navigate("/auth/login");
     },
 
-    onError: (error) => {(
-       axios.isAxiosError(error)
-          ? error.response?.data?.message || "Password reset Failed😢"
-          : "Password Reset Failed😢"
-      
+    onError: (error) => {
+      toast.error(
+        axios.isAxiosError(error)
+          ? error.response?.data?.message || "Password reset failed😢"
+          : "Password reset failed😢"
       );
     },
   });
@@ -244,4 +244,4 @@ const ResetPassword = () => {
   );
 };
 
-export default ResetPassword;
+export default ResetPassword; 

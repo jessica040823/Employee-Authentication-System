@@ -60,6 +60,16 @@ export const deleteUser = async (id: Id) => {
   return response.data;
 };
 
+export const makeAdmin = async (id: string) => {
+  const response = await api.patch(`/admin/users/${id}/make-admin`);
+  return response.data;
+};
+
+export const removeAdmin = async (id: string) => {
+  const response = await api.patch(`/admin/users/${id}/remove-admin`);
+  return response.data;
+};
+
 export const getQueries = async () => {
   const response = await api.get("/contact");
   return response.data;
@@ -101,3 +111,4 @@ export const deleteService = async (id: Id) => {
   const response = await api.delete(`/services/${id}`);
   return response.data;
 };
+
